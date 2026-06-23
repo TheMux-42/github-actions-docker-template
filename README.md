@@ -20,10 +20,11 @@ This template is designed to eliminate manual server builds and provide a fully 
 
 ## 🌿 Branch Strategy
 
-| Branch        | Purpose            | Image Tag |
-|--------------|--------------------|----------|
-| `dev`         | Development        | `dev`    |
-| `latest-stable` | Stable production | `latest-stable` |
+| Branch          | Purpose            | Image Tag        |
+|----------------|--------------------|------------------|
+| `dev`           | Development        | `dev`            |
+| `main`          | Stable production  | `main`           |
+| `v*` (tags)     | Releases           | `v1.0.0`, etc.   |
 
 ---
 
@@ -33,5 +34,6 @@ This template is designed to eliminate manual server builds and provide a fully 
 2. Create a new repository
 3. Clone your new repo:
 
-```bash
+```bash id="clone1"
 git clone https://github.com/TheMux-42/github-actions-docker-template.git
+cd github-actions-docker-template
