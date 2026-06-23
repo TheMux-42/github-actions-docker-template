@@ -1,0 +1,40 @@
+name: Build & Push Docker Image
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set variables (safe + lowercase)
+        run: |
+          REPO="${GITHUB_REPOSITORY,,}"
+          TAG="${GITHUB_REF_NAME}"
+          TAG=$(echo "$TAG" | tr '[:upper:]' '[:lower:]')
+
+          echo "REPO=$REPO" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Debug (optional but useful)
+        run: |
+          echo "Repo: $REPO"
+          echo "Tag: $TAG"
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Image
+        run: docker build -t ghcr.io/${{ env.REPO }}:${{ env.TAG }} .
+
+      - name: Push Image
+        run: docker push ghcr.io/${{ env.REPO }}:${{ env.TAG }}
