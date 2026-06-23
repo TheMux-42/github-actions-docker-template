@@ -3,6 +3,7 @@ name: Build & Push Docker Image
 on:
   push:
     branches: [ "main", "dev" ]
+    tags: [ "v*" ]
 
 jobs:
   build:
@@ -16,10 +17,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set variables (safe + lowercase)
+      - name: Set variables (safe + lowercase + tag/branch aware)
         run: |
           REPO="${GITHUB_REPOSITORY,,}"
-          TAG="${GITHUB_REF_NAME}"
+
+          # detect tag vs branch
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+
+          # lowercase safety
           TAG=$(echo "$TAG" | tr '[:upper:]' '[:lower:]')
 
           echo "REPO=$REPO" >> $GITHUB_ENV
@@ -29,6 +38,7 @@ jobs:
         run: |
           echo "Repo: $REPO"
           echo "Tag: $TAG"
+          echo "Ref type: $GITHUB_REF_TYPE"
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
